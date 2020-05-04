@@ -4,6 +4,8 @@ This is a test I've created to try out some rope physics on Unity.
 
 Ended up doing a more or less generic component that used DistanceJoint2d and FixedJoint2d to achieve the rope effect.
 
+![Image](https://github.com/DiogoDeAndrade/RopeTest/raw/master/Screenshots/screen01.png)
+
 ## Tech stuff
 
 The Rope component just needs to be added to the "anchor point" of the rope, and the connectedObject property set to the object that we want to tie to the object.
