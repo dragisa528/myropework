@@ -26,6 +26,7 @@ The code ended up not being too complex, but it's quite cool, even in the curren
 All code in this repo is made available through the [GPLv3] license.
 
 Spike ball: © 2005-2013 Julien Jorge <julien.jorge@stuff-o-matic.com>
+
 Chain Element: © 2017 Fun Punch Games Ltd. 
 
 ## Metadata
