@@ -8,7 +8,7 @@ public class RopeDJ : MonoBehaviour
     public Rigidbody2D  connectedObject;
     public LayerMask    collisionMask;
     public float        collisionTolerance = 1;
-
+    public float        thickness = 0;
 
     class Joint
     {
@@ -158,15 +158,27 @@ public class RopeDJ : MonoBehaviour
     Vector3 GetHookPosition(Vector2 startPos)
     {
         // Find position, raycast from object to position
-        Vector2 dir = startPos - connectedObject.position;
-        float distance = dir.magnitude;
-        var hits = Physics2D.RaycastAll(connectedObject.position, dir, distance, collisionMask);
+        Vector2         dir = startPos - connectedObject.position;
+        float           distance = dir.magnitude;
+        Vector2         rayStart;
+        RaycastHit2D[]  hits;
+
+        if (thickness <= 0.0f)
+        {
+            rayStart = connectedObject.position;
+            hits = Physics2D.RaycastAll(rayStart, dir, distance, collisionMask);
+        }
+        else
+        {
+            rayStart = connectedObject.position + dir.normalized * thickness;
+            hits = Physics2D.CircleCastAll(rayStart, thickness, dir, distance - 2 * thickness, collisionMask);
+        }
 
         foreach (var hit in hits)
         {
             if (hit.collider.gameObject != connectedObject.gameObject)
             {
-                return hit.point;
+                return rayStart + hit.distance * dir.normalized;
             }
         }
 
@@ -178,7 +190,16 @@ public class RopeDJ : MonoBehaviour
         List<RaycastHit2D>  ret = new List<RaycastHit2D>();
         Vector2             dir = endPos - startPos;
         float               distance = dir.magnitude;
-        var                 hits = Physics2D.RaycastAll(startPos + dir.normalized * collisionTolerance, dir, distance - 2 * collisionTolerance, collisionMask);
+        RaycastHit2D[]      hits;
+
+        if (thickness <= 0.0f)
+        {
+            hits = Physics2D.RaycastAll(startPos + dir.normalized * collisionTolerance, dir, distance - 2 * collisionTolerance, collisionMask);
+        }
+        else
+        {
+            hits = Physics2D.CircleCastAll(startPos + dir.normalized * (collisionTolerance + thickness), thickness, dir, distance - 2 * (collisionTolerance + thickness), collisionMask);
+        }
 
         foreach (var hit in hits)
         {
@@ -226,6 +247,10 @@ public class RopeDJ : MonoBehaviour
                 else Gizmos.color = Color.yellow;
 
                 Gizmos.DrawLine(j.dj.transform.position, j.dj.connectedBody.transform.position);
+                if (thickness > 0.0f)
+                {
+                    Gizmos.DrawWireSphere(j.dj.transform.position, thickness);
+                }
             }
         }
         else
@@ -234,6 +259,12 @@ public class RopeDJ : MonoBehaviour
             {
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(transform.position, connectedObject.transform.position);
+
+                if (thickness > 0.0f)
+                {
+                    Gizmos.DrawWireSphere(transform.position, thickness);
+                    Gizmos.DrawWireSphere(connectedObject.transform.position, thickness);
+                }
             }
         }
     }
